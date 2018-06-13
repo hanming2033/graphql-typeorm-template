@@ -11,6 +11,7 @@ export const confirmEmail = async (req: Request, res: Response) => {
   if (userId) {
     // update db through typeOrm
     await User.update({ id: userId }, { confirmed: true })
+    // delete the key in redis so confirmation link will not work again
     await redis.del(id)
     // TODO: change response type to work with client
     res.send('ok')

@@ -49,6 +49,7 @@ export const resolvers: ResolverMap = {
       // save user to database
       await user.save()
 
+      // TODO: sending email using 3rd party implementation
       // if (process.env.NODE_ENV !== 'test') {
       //   await sendEmail(
       //     email,
