@@ -1,7 +1,7 @@
 import { Connection } from "typeorm";
 import * as faker from "faker";
 
-import { invalidLogin, confirmEmailError } from "./errorMessages";
+import { INVALID_LOGIN, EMAIL_NOT_CONFIRMED } from "./errorMessages";
 import { User } from "../../../entity/User";
 import { TestClient } from "../../../utils/TestClient";
 import { createTestConn } from "../../../testUtils/createTestConn";
@@ -12,6 +12,7 @@ const password = faker.internet.password();
 
 const client = new TestClient(process.env.TEST_HOST as string);
 
+// whenever typeorm will be used. create a typeorm connection
 let conn: Connection;
 beforeAll(async () => {
   conn = await createTestConn();
@@ -20,9 +21,10 @@ afterAll(async () => {
   conn.close();
 });
 
+// outsource test function
 const loginExpectError = async (e: string, p: string, errMsg: string) => {
   const response = await client.login(e, p);
-
+  // login here is designed to fail due to various situation
   expect(response.data).toEqual({
     login: [
       {
@@ -34,25 +36,27 @@ const loginExpectError = async (e: string, p: string, errMsg: string) => {
 };
 
 describe("login", () => {
-  test("email not found send back error", async () => {
+  // *do a simply login without registering
+  test("login without registering email sends back error", async () => {
     await loginExpectError(
       faker.internet.email(),
       faker.internet.password(),
-      invalidLogin
+      INVALID_LOGIN
     );
   });
 
-  test("email not confirmed", async () => {
+  // *login after registering email, then chaning the confirm status
+  test("email not confirmed & then confirmed", async () => {
+
     await client.register(email, password);
-
-    await loginExpectError(email, password, confirmEmailError);
-
+    // user is not confirmed yet
+    await loginExpectError(email, password, EMAIL_NOT_CONFIRMED);
+    // update user to confirm status true
     await User.update({ email }, { confirmed: true });
-
-    await loginExpectError(email, faker.internet.password(), invalidLogin);
-
+    // login with different pw after confirming 
+    await loginExpectError(email, faker.internet.password(), INVALID_LOGIN);
+    // login with correct username and pw while confirm = true should return null
     const response = await client.login(email, password);
-
     expect(response.data).toEqual({ login: null });
   });
 });

@@ -1,5 +1,5 @@
-import 'reflect-metadata'
-import 'dotenv/config'
+import 'reflect-metadata' // import here and not index.js because test does not run index.js
+import 'dotenv/config' // import here and not index.js because test does not run index.js
 import { GraphQLServer } from 'graphql-yoga'
 import * as session from 'express-session'
 import * as connectRedis from 'connect-redis'
@@ -8,12 +8,14 @@ import * as RateLimitRedisStore from 'rate-limit-redis'
 
 import { redis } from './redis'
 import { createTypeormConn } from './utils/createTypeormConn'
-import { confirmEmail } from './routes/confirmEmail'
+import { confirmEmail } from './rest-routes/confirmEmail'
 import { genSchema } from './utils/genSchema'
 import { redisSessionPrefix } from './constants'
 import { createTestConn } from './testUtils/createTestConn'
 
 const SESSION_SECRET = 'ajslkjalksjdfkl'
+
+// this is neccessary for put it into express session
 const RedisStore = connectRedis(session as any)
 
 // export the function so Jest can test it
@@ -49,17 +51,19 @@ export const startServer = async () => {
 
   server.express.use(
     session({
+      // store is persistent storerage of session information
+      // ?consider changing to postgres of db of choice. prob: redis is used to store activation link
       store: new RedisStore({
         client: redis as any,
         prefix: redisSessionPrefix
       }),
-      name: 'qid',
-      secret: SESSION_SECRET,
+      name: 'qid', // any name will do
+      secret: SESSION_SECRET, // a random secret string
       resave: false,
-      saveUninitialized: false,
+      saveUninitialized: false, // will not create a cookie until session is change
       cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === 'production', // must run https
         maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
       }
     } as any)
@@ -67,7 +71,7 @@ export const startServer = async () => {
 
   const cors = {
     credentials: true,
-    origin: process.env.NODE_ENV === 'test' ? '*' : (process.env.FRONTEND_HOST as string)
+    origin: process.env.NODE_ENV === 'test' ? '*' : (process.env.FRONTEND_HOST as string) // test NODE_ENV because test mode port is random
   }
 
   // *create a REST api for email confirmation
@@ -92,5 +96,3 @@ export const startServer = async () => {
 
   return app
 }
-
-// TODO: https://www.youtube.com/watch?v=7XUFVQh6XAQ&t=197s start

@@ -1,19 +1,19 @@
-import * as rp from "request-promise";
+import * as rp from 'request-promise'
 
 export class TestClient {
-  url: string;
+  url: string
   options: {
-    jar: any;
-    withCredentials: boolean;
-    json: boolean;
-  };
+    jar: any
+    withCredentials: boolean
+    json: boolean
+  }
   constructor(url: string) {
-    this.url = url;
+    this.url = url
     this.options = {
-      withCredentials: true,
+      withCredentials: true, // true enables saving of cookies
       jar: rp.jar(),
       json: true
-    };
+    }
   }
 
   async register(email: string, password: string) {
@@ -29,7 +29,7 @@ export class TestClient {
           }
         `
       }
-    });
+    })
   }
 
   async logout() {
@@ -42,7 +42,7 @@ export class TestClient {
         }
         `
       }
-    });
+    })
   }
 
   async forgotPasswordChange(newPassword: string, key: string) {
@@ -58,7 +58,7 @@ export class TestClient {
           }
         `
       }
-    });
+    })
   }
 
   async me() {
@@ -74,7 +74,7 @@ export class TestClient {
           }
         `
       }
-    });
+    })
   }
 
   async login(email: string, password: string) {
@@ -90,6 +90,6 @@ export class TestClient {
         }
         `
       }
-    });
+    })
   }
 }

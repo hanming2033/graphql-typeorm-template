@@ -8,7 +8,7 @@ import { createForgotPasswordLink } from "../../../utils/createForgotPasswordLin
 import { forgotPasswordLockAccount } from "../../../utils/forgotPasswordLockAccount";
 import { PASSWORD_TOO_SHORT } from "../register/errorMessages";
 import { expiredKeyError } from "./errorMessages";
-import { forgotPasswordLockedError } from "../login/errorMessages";
+import { ACCOUNT_LOCKED } from "../login/errorMessages";
 import { createTestConn } from "../../../testUtils/createTestConn";
 
 let conn: Connection;
@@ -50,7 +50,7 @@ describe("forgot password", () => {
         login: [
           {
             path: "email",
-            message: forgotPasswordLockedError
+            message: ACCOUNT_LOCKED
           }
         ]
       }
