@@ -6,6 +6,7 @@ export const resolvers: ResolverMap = {
     logout: async (_, __, { session, redis }) => {
       const { userId } = session
       if (userId) {
+        
         removeAllUsersSessions(userId, redis)
         // destroy current user session
         session.destroy(err => {

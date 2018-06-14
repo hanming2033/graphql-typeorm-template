@@ -1,5 +1,6 @@
 import * as rp from 'request-promise'
 
+// think of this as normal computer/phone accessing server
 export class TestClient {
   url: string
   options: {
@@ -8,10 +9,11 @@ export class TestClient {
     json: boolean
   }
   constructor(url: string) {
+    // url or port changes per test
     this.url = url
     this.options = {
       withCredentials: true, // true enables saving of cookies
-      jar: rp.jar(),
+      jar: rp.jar(), // cookie jar: all cookies will be stored here
       json: true
     }
   }
@@ -78,6 +80,7 @@ export class TestClient {
   }
 
   async login(email: string, password: string) {
+    // make a post request with url and options
     return rp.post(this.url, {
       ...this.options,
       body: {
@@ -91,5 +94,8 @@ export class TestClient {
         `
       }
     })
+    // return a request promise
   }
 }
+
+// TODO: https://www.youtube.com/watch?v=pvjOOApb6nk 1100
